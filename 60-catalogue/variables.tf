@@ -8,12 +8,3 @@ variable "environment" {
     default = "dev"
 }
 
-
-variable "zone_id" {
-    default = "Z02592383JVQTDY6U9ADB"
-}
-
-variable "zone_name" {
-    default = "daws84s.info"
-  
-}

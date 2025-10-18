@@ -52,7 +52,7 @@ module "mongodb" {
     project = var.project
     environment = var.environment
 
-    sg_name = "mondodb"
+    sg_name = "mongodb"
     sg_description = "for mongodb"
     vpc_id = local.vpc_id
 }
@@ -90,6 +90,18 @@ module "rabbitmq" {
 
     sg_name = "rabbitmq"
     sg_description = "for rabbitmq"
+    vpc_id = local.vpc_id
+}
+
+
+module "catalogue" {
+    # source = "../../terraform-aws-securitygroup"
+    source = "git::https://github.com/kvk55247/terraform-aws-securitygroup.git?ref=main"
+    project = var.project
+    environment = var.environment
+
+    sg_name = "catalogue"
+    sg_description = "for catalogue"
     vpc_id = local.vpc_id
 }
 
@@ -204,5 +216,61 @@ resource "aws_security_group_rule" "rabbitmq_ssh_vpn" {
   source_security_group_id = module.vpn.sg_id
   security_group_id = module.rabbitmq.sg_id
 } 
+
+resource "aws_security_group_rule" "catalogue_backend_alb" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  source_security_group_id = module.backend_alb.sg_id
+  security_group_id = module.catalogue.sg_id
+} 
+
+resource "aws_security_group_rule" "catalogue_vpn_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  source_security_group_id = module.vpn.sg_id
+  security_group_id = module.catalogue.sg_id
+} 
+
+
+resource "aws_security_group_rule" "catalogue_vpn_http" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  source_security_group_id = module.vpn.sg_id
+  security_group_id = module.catalogue.sg_id
+} 
+
+
+resource "aws_security_group_rule" "catalogue_bastion" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  source_security_group_id = module.bastion.sg_id
+  security_group_id = module.catalogue.sg_id
+} 
+
+
+
+resource "aws_security_group_rule" "mongodb_catalogue" {
+  type              = "ingress"
+  from_port         = 27017
+  to_port           = 27017
+  protocol          = "tcp"
+  source_security_group_id = module.catalogue.sg_id
+  security_group_id = module.mongodb.sg_id
+} 
+
+
+
+
+
+
+
 
 
