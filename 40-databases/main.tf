@@ -208,5 +208,8 @@ resource "aws_route53_record" "rabbitmq" {
 
 }
 
+<<<<<<< HEAD
 
   
+=======
+>>>>>>> 7967ed1 (terraform)
